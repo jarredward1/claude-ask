@@ -17,6 +17,7 @@
       --gold-dim:  rgba(201,168,76,0.15);
       --text:      #e8e4dc;
       --muted:     #6b7280;
+      --green:     #28c840;
       --mono:      'JetBrains Mono', monospace;
       --sans:      'Inter', sans-serif;
     }
@@ -58,6 +59,7 @@
       padding: 14px 20px;
       border-bottom: 1px solid var(--border);
       background: rgba(0,0,0,0.2);
+      border-radius: 10px 10px 0 0;
     }
 
     .dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -74,73 +76,13 @@
       text-transform: uppercase;
     }
 
-    /* ── key prompt ── */
-    #key-block {
-      padding: 28px 24px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .key-eyebrow {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .key-note {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 16px;
-      line-height: 1.6;
-    }
-
-    .key-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    #key-input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    #key-input:focus { border-color: var(--gold); }
-
-    #key-submit {
-      background: var(--gold);
-      color: #0f1117;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 18px;
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.2s;
-    }
-
-    #key-submit:hover { opacity: 0.85; }
-
-    /* ── query block ── */
-    .query-block {
+    /* ── prompt block ── */
+    .prompt-block {
       padding: 22px 24px;
       border-bottom: 1px solid var(--border);
-      display: none;
     }
 
-    .query-eyebrow {
+    .prompt-eyebrow {
       font-family: var(--mono);
       font-size: 10px;
       letter-spacing: 0.14em;
@@ -149,104 +91,84 @@
       margin-bottom: 10px;
     }
 
-    #query-text {
+    #prompt-text {
       font-family: var(--mono);
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.65;
       color: var(--text);
       white-space: pre-wrap;
       word-break: break-word;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
-    /* ── loader ── */
-    #loader {
-      padding: 36px 24px;
-      display: none;
+    /* ── action block ── */
+    .action-block {
+      padding: 28px 24px;
+      display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 14px;
+      gap: 16px;
     }
 
-    .loader-label {
+    .status {
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.12em;
+      font-size: 12px;
+      letter-spacing: 0.1em;
       color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .bar-track {
-      width: 100%;
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .bar-fill {
-      height: 100%;
-      width: 30%;
-      background: var(--gold);
-      border-radius: 2px;
-      animation: slide 1.4s ease-in-out infinite;
-    }
-
-    @keyframes slide {
-      0%   { transform: translateX(-100%); width: 30%; }
-      50%  { width: 60%; }
-      100% { transform: translateX(400%); width: 30%; }
-    }
-
-    /* ── answer ── */
-    #answer-block {
-      display: none;
-      padding: 24px;
-    }
-
-    .answer-eyebrow {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .answer-eyebrow::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--gold-dim);
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s;
     }
 
-    #answer-text {
-      font-size: 15px;
-      font-weight: 300;
-      line-height: 1.75;
-      color: var(--text);
-      white-space: pre-wrap;
-      word-break: break-word;
+    .status-dot.ready { background: var(--green); }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    /* ── error ── */
-    #error-block {
-      display: none;
-      padding: 24px;
-    }
-
-    #error-text {
+    .btn {
       font-family: var(--mono);
-      font-size: 13px;
-      color: #ff6b6b;
-      background: rgba(255,107,107,0.08);
-      border: 1px solid rgba(255,107,107,0.2);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 12px 20px;
       border-radius: 6px;
-      padding: 16px;
-      line-height: 1.6;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #0f1117;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
 
     /* ── no-query state ── */
     #no-query {
@@ -279,6 +201,29 @@
       text-align: center;
       line-height: 1.8;
     }
+
+    .copied-toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--green);
+      color: #0f1117;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 10px 20px;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+
+    .copied-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -293,135 +238,71 @@
       <span class="card-label">ask.html</span>
     </div>
 
-    <!-- API key prompt -->
-    <div id="key-block">
-      <div class="key-eyebrow">API Key Required</div>
-      <p class="key-note">Paste your Anthropic API key below. It stays in your browser only — it is never sent to GitHub or stored anywhere.</p>
-      <div class="key-row">
-        <input id="key-input" type="password" placeholder="sk-ant-..." spellcheck="false" />
-        <button id="key-submit">Submit</button>
+    <div id="main-content" style="display:none;">
+      <div class="prompt-block">
+        <div class="prompt-eyebrow">Prompt</div>
+        <div id="prompt-text"></div>
+      </div>
+
+      <div class="action-block">
+        <div class="status">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-label">Preparing prompt...</span>
+        </div>
+        <div class="buttons">
+          <button class="btn btn-primary" id="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+          <a class="btn btn-secondary" href="https://claude.ai" target="_blank" id="claude-btn">Open Claude.ai →</a>
+        </div>
       </div>
     </div>
 
-    <!-- Query display -->
-    <div class="query-block" id="query-block">
-      <div class="query-eyebrow">Query</div>
-      <div id="query-text"></div>
-    </div>
-
     <div id="no-query">
-      <p>No question detected.<br/>Add a <code>?q=your+question</code> parameter to the URL.</p>
-    </div>
-
-    <div id="loader">
-      <div class="loader-label">Claude is thinking</div>
-      <div class="bar-track"><div class="bar-fill"></div></div>
-    </div>
-
-    <div id="answer-block">
-      <div class="answer-eyebrow">Response</div>
-      <div id="answer-text"></div>
-    </div>
-
-    <div id="error-block">
-      <div id="error-text"></div>
+      <p>No prompt detected.<br/>Add a <code>?q=your+prompt</code> parameter to the URL.</p>
     </div>
   </div>
 
   <div class="footer">
-    Powered by Claude · Your key is never stored or logged<br/>
-    Questions go directly from your browser to the Anthropic API
+    Claude Query Terminal · Prompts are never stored or transmitted<br/>
+    Everything stays in your browser
   </div>
 
+  <div class="copied-toast" id="toast">Copied to clipboard</div>
+
   <script>
-    const params   = new URLSearchParams(window.location.search);
-    const question = params.get('q') || '';
+    const params  = new URLSearchParams(window.location.search);
+    const prompt  = params.get('q') || '';
 
-    const keyBlock    = document.getElementById('key-block');
-    const keyInput    = document.getElementById('key-input');
-    const keySubmit   = document.getElementById('key-submit');
-    const queryBlock  = document.getElementById('query-block');
-    const queryText   = document.getElementById('query-text');
+    const mainContent = document.getElementById('main-content');
     const noQuery     = document.getElementById('no-query');
-    const loader      = document.getElementById('loader');
-    const answerBlock = document.getElementById('answer-block');
-    const answerText  = document.getElementById('answer-text');
-    const errorBlock  = document.getElementById('error-block');
-    const errorText   = document.getElementById('error-text');
+    const promptText  = document.getElementById('prompt-text');
+    const statusDot   = document.getElementById('status-dot');
+    const statusLabel = document.getElementById('status-label');
+    const toast       = document.getElementById('toast');
 
-    // Check if key is already in session memory
-    let apiKey = localStorage.getItem('claude_api_key') || '';
+    if (!prompt.trim()) {
+      noQuery.style.display = 'block';
+    } else {
+      mainContent.style.display = 'block';
+      promptText.textContent = prompt;
 
-    if (apiKey) {
-      keyBlock.style.display = 'none';
-      start();
+      // Auto-copy on load
+      copyPrompt(true);
     }
 
-    keySubmit.addEventListener('click', () => {
-      const val = keyInput.value.trim();
-      if (!val.startsWith('sk-')) {
-        keyInput.style.borderColor = '#ff6b6b';
-        return;
-      }
-      apiKey = val;
-      localStorage.setItem('claude_api_key', apiKey);
-      keyBlock.style.display = 'none';
-      start();
-    });
-
-    keyInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') keySubmit.click();
-    });
-
-    function start() {
-      if (!question.trim()) {
-        noQuery.style.display = 'block';
-        return;
-      }
-      queryBlock.style.display = 'block';
-      queryText.textContent = question;
-      loader.style.display = 'flex';
-      askClaude(question);
-    }
-
-    async function askClaude(q) {
+    async function copyPrompt(silent) {
       try {
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-6',
-            max_tokens: 32000,
-            messages: [{ role: 'user', content: q }]
-          })
-        });
+        await navigator.clipboard.writeText(prompt);
+        statusDot.classList.add('ready');
+        statusLabel.textContent = 'Prompt copied to clipboard — paste it into Claude.ai';
 
-        const data = await res.json();
-        loader.style.display = 'none';
-
-        if (!res.ok) {
-          // If unauthorized, clear the saved key so they can re-enter
-          if (res.status === 401) {
-            localStorage.removeItem('claude_api_key');
-          }
-          errorBlock.style.display = 'block';
-          errorText.textContent = `Error ${res.status}: ${data.error?.message || JSON.stringify(data)}`;
-          return;
+        if (!silent) {
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 2000);
         }
-
-        const reply = data.content?.map(b => b.text || '').join('') || '(no response)';
-        answerBlock.style.display = 'block';
-        answerText.textContent = reply;
-
       } catch (err) {
-        loader.style.display = 'none';
-        errorBlock.style.display = 'block';
-        errorText.textContent = `Network error: ${err.message}`;
+        // Fallback for browsers that block auto-copy
+        statusDot.style.background = '#febc2e';
+        statusLabel.textContent = 'Click "Copy Prompt" to copy, then paste into Claude.ai';
       }
     }
   </script>
