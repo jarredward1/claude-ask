@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ask Claude</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #181c27;
+      --border:    #2a2f42;
+      --gold:      #c9a84c;
+      --gold-dim:  rgba(201,168,76,0.15);
+      --text:      #e8e4dc;
+      --muted:     #6b7280;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'Inter', sans-serif;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── wordmark ── */
+    .wordmark {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 48px;
+      opacity: 0.75;
+    }
+
+    /* ── query card ── */
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .card-label {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .query-block {
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .query-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    #query-text {
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ── loader ── */
+    #loader {
+      padding: 36px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .loader-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 30%;
+      background: var(--gold);
+      border-radius: 2px;
+      animation: slide 1.4s ease-in-out infinite;
+    }
+
+    @keyframes slide {
+      0%   { transform: translateX(-100%); width: 30%; }
+      50%  { width: 60%; }
+      100% { transform: translateX(400%); width: 30%; }
+    }
+
+    /* ── answer ── */
+    #answer-block {
+      display: none;
+      padding: 24px;
+    }
+
+    .answer-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .answer-eyebrow::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gold-dim);
+    }
+
+    #answer-text {
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ── error ── */
+    #error-block {
+      display: none;
+      padding: 24px;
+    }
+
+    #error-text {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #ff6b6b;
+      background: rgba(255,107,107,0.08);
+      border: 1px solid rgba(255,107,107,0.2);
+      border-radius: 6px;
+      padding: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── footer ── */
+    .footer {
+      margin-top: 32px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    /* ── no-query state ── */
+    #no-query {
+      display: none;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    #no-query p {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    #no-query code {
+      background: var(--gold-dim);
+      color: var(--gold);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wordmark">Claude Query Terminal</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="card-label">ask.html</span>
+    </div>
+
+    <div class="query-block" id="query-block" style="display:none;">
+      <div class="query-eyebrow">Query</div>
+      <div id="query-text"></div>
+    </div>
+
+    <div id="no-query">
+      <p>No question detected.<br/>
+      Add a <code>?q=your+question</code> parameter to the URL.</p>
+    </div>
+
+    <div id="loader" style="display:none;">
+      <div class="loader-label">Claude is thinking</div>
+      <div class="bar-track"><div class="bar-fill"></div></div>
+    </div>
+
+    <div id="answer-block">
+      <div class="answer-eyebrow">Response</div>
+      <div id="answer-text"></div>
+    </div>
+
+    <div id="error-block">
+      <div id="error-text"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Powered by Claude · Questions go directly to the Anthropic API<br/>
+    Nothing is stored or logged
+  </div>
+
+  <script>
+    const params  = new URLSearchParams(window.location.search);
+    const question = params.get('q') || '';
+
+    const queryBlock  = document.getElementById('query-block');
+    const queryText   = document.getElementById('query-text');
+    const noQuery     = document.getElementById('no-query');
+    const loader      = document.getElementById('loader');
+    const answerBlock = document.getElementById('answer-block');
+    const answerText  = document.getElementById('answer-text');
+    const errorBlock  = document.getElementById('error-block');
+    const errorText   = document.getElementById('error-text');
+
+    if (!question.trim()) {
+      noQuery.style.display = 'block';
+    } else {
+      queryBlock.style.display = 'block';
+      queryText.textContent = question;
+      loader.style.display = 'flex';
+      askClaude(question);
+    }
+
+    async function askClaude(q) {
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 1024,
+            messages: [{ role: 'user', content: q }]
+          })
+        });
+
+        const data = await res.json();
+
+        loader.style.display = 'none';
+
+        if (!res.ok) {
+          errorBlock.style.display = 'block';
+          errorText.textContent = `API error ${res.status}: ${data.error?.message || JSON.stringify(data)}`;
+          return;
+        }
+
+        const reply = data.content?.map(b => b.text || '').join('') || '(no response)';
+        answerBlock.style.display = 'block';
+        answerText.textContent = reply;
+
+      } catch (err) {
+        loader.style.display = 'none';
+        errorBlock.style.display = 'block';
+        errorText.textContent = `Network error: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
