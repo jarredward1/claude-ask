@@ -32,7 +32,6 @@
       padding: 48px 24px 80px;
     }
 
-    /* ── wordmark ── */
     .wordmark {
       font-family: var(--mono);
       font-size: 11px;
@@ -43,7 +42,6 @@
       opacity: 0.75;
     }
 
-    /* ── query card ── */
     .card {
       width: 100%;
       max-width: 680px;
@@ -76,9 +74,70 @@
       text-transform: uppercase;
     }
 
+    /* ── key prompt ── */
+    #key-block {
+      padding: 28px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .key-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .key-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .key-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    #key-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #key-input:focus { border-color: var(--gold); }
+
+    #key-submit {
+      background: var(--gold);
+      color: #0f1117;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    #key-submit:hover { opacity: 0.85; }
+
+    /* ── query block ── */
     .query-block {
       padding: 22px 24px;
       border-bottom: 1px solid var(--border);
+      display: none;
     }
 
     .query-eyebrow {
@@ -102,7 +161,7 @@
     /* ── loader ── */
     #loader {
       padding: 36px 24px;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: flex-start;
       gap: 14px;
@@ -189,17 +248,6 @@
       line-height: 1.6;
     }
 
-    /* ── footer ── */
-    .footer {
-      margin-top: 32px;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.8;
-    }
-
     /* ── no-query state ── */
     #no-query {
       display: none;
@@ -221,6 +269,16 @@
       border-radius: 3px;
       font-size: 12px;
     }
+
+    .footer {
+      margin-top: 32px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
@@ -235,17 +293,27 @@
       <span class="card-label">ask.html</span>
     </div>
 
-    <div class="query-block" id="query-block" style="display:none;">
+    <!-- API key prompt -->
+    <div id="key-block">
+      <div class="key-eyebrow">API Key Required</div>
+      <p class="key-note">Paste your Anthropic API key below. It stays in your browser only — it is never sent to GitHub or stored anywhere.</p>
+      <div class="key-row">
+        <input id="key-input" type="password" placeholder="sk-ant-..." spellcheck="false" />
+        <button id="key-submit">Submit</button>
+      </div>
+    </div>
+
+    <!-- Query display -->
+    <div class="query-block" id="query-block">
       <div class="query-eyebrow">Query</div>
       <div id="query-text"></div>
     </div>
 
     <div id="no-query">
-      <p>No question detected.<br/>
-      Add a <code>?q=your+question</code> parameter to the URL.</p>
+      <p>No question detected.<br/>Add a <code>?q=your+question</code> parameter to the URL.</p>
     </div>
 
-    <div id="loader" style="display:none;">
+    <div id="loader">
       <div class="loader-label">Claude is thinking</div>
       <div class="bar-track"><div class="bar-fill"></div></div>
     </div>
@@ -261,14 +329,17 @@
   </div>
 
   <div class="footer">
-    Powered by Claude · Questions go directly to the Anthropic API<br/>
-    Nothing is stored or logged
+    Powered by Claude · Your key is never stored or logged<br/>
+    Questions go directly from your browser to the Anthropic API
   </div>
 
   <script>
-    const params  = new URLSearchParams(window.location.search);
+    const params   = new URLSearchParams(window.location.search);
     const question = params.get('q') || '';
 
+    const keyBlock    = document.getElementById('key-block');
+    const keyInput    = document.getElementById('key-input');
+    const keySubmit   = document.getElementById('key-submit');
     const queryBlock  = document.getElementById('query-block');
     const queryText   = document.getElementById('query-text');
     const noQuery     = document.getElementById('no-query');
@@ -278,9 +349,35 @@
     const errorBlock  = document.getElementById('error-block');
     const errorText   = document.getElementById('error-text');
 
-    if (!question.trim()) {
-      noQuery.style.display = 'block';
-    } else {
+    // Check if key is already in session memory
+    let apiKey = sessionStorage.getItem('claude_api_key') || '';
+
+    if (apiKey) {
+      keyBlock.style.display = 'none';
+      start();
+    }
+
+    keySubmit.addEventListener('click', () => {
+      const val = keyInput.value.trim();
+      if (!val.startsWith('sk-')) {
+        keyInput.style.borderColor = '#ff6b6b';
+        return;
+      }
+      apiKey = val;
+      sessionStorage.setItem('claude_api_key', apiKey);
+      keyBlock.style.display = 'none';
+      start();
+    });
+
+    keyInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') keySubmit.click();
+    });
+
+    function start() {
+      if (!question.trim()) {
+        noQuery.style.display = 'block';
+        return;
+      }
       queryBlock.style.display = 'block';
       queryText.textContent = question;
       loader.style.display = 'flex';
@@ -291,7 +388,11 @@
       try {
         const res = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01'
+          },
           body: JSON.stringify({
             model: 'claude-sonnet-4-6',
             max_tokens: 1024,
@@ -300,12 +401,15 @@
         });
 
         const data = await res.json();
-
         loader.style.display = 'none';
 
         if (!res.ok) {
+          // If unauthorized, clear the saved key so they can re-enter
+          if (res.status === 401) {
+            sessionStorage.removeItem('claude_api_key');
+          }
           errorBlock.style.display = 'block';
-          errorText.textContent = `API error ${res.status}: ${data.error?.message || JSON.stringify(data)}`;
+          errorText.textContent = `Error ${res.status}: ${data.error?.message || JSON.stringify(data)}`;
           return;
         }
 
