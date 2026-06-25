@@ -101,6 +101,12 @@
       max-height: 300px;
       overflow-y: auto;
       padding-right: 4px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: vertical;
+      min-height: 80px;
     }
 
     /* ── action block ── */
@@ -241,7 +247,7 @@
     <div id="main-content" style="display:none;">
       <div class="prompt-block">
         <div class="prompt-eyebrow">Prompt</div>
-        <div id="prompt-text"></div>
+        <textarea id="prompt-text" spellcheck="false"></textarea>
       </div>
 
       <div class="action-block">
@@ -283,7 +289,7 @@
       noQuery.style.display = 'block';
     } else {
       mainContent.style.display = 'block';
-      promptText.textContent = prompt;
+      promptText.value = prompt;
 
       // Auto-copy on load
       copyPrompt(true);
@@ -291,7 +297,7 @@
 
     async function copyPrompt(silent) {
       try {
-        await navigator.clipboard.writeText(prompt);
+        await navigator.clipboard.writeText(promptText.value);
         statusDot.classList.add('ready');
         statusLabel.textContent = 'Prompt copied to clipboard — paste it into Claude.ai';
 
