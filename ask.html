@@ -350,7 +350,7 @@
     const errorText   = document.getElementById('error-text');
 
     // Check if key is already in session memory
-    let apiKey = sessionStorage.getItem('claude_api_key') || '';
+    let apiKey = localStorage.getItem('claude_api_key') || '';
 
     if (apiKey) {
       keyBlock.style.display = 'none';
@@ -364,7 +364,7 @@
         return;
       }
       apiKey = val;
-      sessionStorage.setItem('claude_api_key', apiKey);
+      localStorage.setItem('claude_api_key', apiKey);
       keyBlock.style.display = 'none';
       start();
     });
@@ -407,7 +407,7 @@
         if (!res.ok) {
           // If unauthorized, clear the saved key so they can re-enter
           if (res.status === 401) {
-            sessionStorage.removeItem('claude_api_key');
+            localStorage.removeItem('claude_api_key');
           }
           errorBlock.style.display = 'block';
           errorText.textContent = `Error ${res.status}: ${data.error?.message || JSON.stringify(data)}`;
