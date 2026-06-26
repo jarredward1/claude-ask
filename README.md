@@ -1,4 +1,4 @@
-# Claude Ask
+# Claude-Ask
 
 ![HTML](https://img.shields.io/badge/Language-HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 
