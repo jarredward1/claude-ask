@@ -18,7 +18,7 @@ No API key. No backend. Nothing stored.
 
 - Reads prompt content from a URL parameter
 - Auto-copies to clipboard on load
-- Editable before sending — you can adjust the prompt on the page
+- Editable before sending: you can adjust the prompt on the page
 - Opens Claude.ai directly
 - Nothing is logged or stored anywhere
 - Hosted on GitHub Pages, no server required
