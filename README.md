@@ -60,23 +60,6 @@ Drag the formula down and each row gets its own link.
 
 ---
 
-## Hosting Your Own Copy
-
-1. Fork or clone this repo
-2. Go to **Settings → Pages**
-3. Set source to `main` branch, `/ (root)`
-4. Your URL will be `https://yourusername.github.io/claude-ask/ask.html`
-
----
-
-## Stack
-
-- HTML, CSS, JavaScript
-- [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) + [Inter](https://fonts.google.com/specimen/Inter)
-- GitHub Pages
-
----
-
 ## Privacy
 
 No data is collected, stored, or sent anywhere. Prompts exist only in the URL and your clipboard.
